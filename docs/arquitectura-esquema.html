@@ -1,0 +1,507 @@
+<title>D'asaro — Esquema de Arquitectura</title>
+<style>
+  @font-face {
+    font-family: "system-serif";
+    src: local("Iowan Old Style"), local("Sitka Small"), local("Georgia");
+  }
+
+  :root {
+    --paper: #eef1ea;
+    --surface: #ffffff;
+    --ink: #16211b;
+    --muted: #5c6b60;
+    --line: rgba(22, 33, 27, 0.13);
+    --accent: #1e6e58;
+    --accent-soft: rgba(30, 110, 88, 0.12);
+    --accent-2: #a86a1f;
+    --accent-2-soft: rgba(168, 106, 31, 0.13);
+    --plate-bg: #fbf9f2;
+    --plate-ink: #1b2a22;
+    --plate-line: rgba(27, 42, 34, 0.2);
+    --plate-accent: #1e6e58;
+    --plate-accent-2: #a86a1f;
+    --font-display: "system-serif", "Iowan Old Style", "Sitka Small", Georgia, "Times New Roman", serif;
+    --font-body: "Seravek", "Charter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0f1512;
+      --surface: #171f1a;
+      --ink: #e7ece6;
+      --muted: #93a599;
+      --line: rgba(231, 236, 230, 0.14);
+      --accent: #56c9a2;
+      --accent-soft: rgba(86, 201, 162, 0.14);
+      --accent-2: #e0aa5c;
+      --accent-2-soft: rgba(224, 170, 92, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0f1512;
+    --surface: #171f1a;
+    --ink: #e7ece6;
+    --muted: #93a599;
+    --line: rgba(231, 236, 230, 0.14);
+    --accent: #56c9a2;
+    --accent-soft: rgba(86, 201, 162, 0.14);
+    --accent-2: #e0aa5c;
+    --accent-2-soft: rgba(224, 170, 92, 0.14);
+  }
+  :root[data-theme="light"] {
+    --paper: #eef1ea;
+    --surface: #ffffff;
+    --ink: #16211b;
+    --muted: #5c6b60;
+    --line: rgba(22, 33, 27, 0.13);
+    --accent: #1e6e58;
+    --accent-soft: rgba(30, 110, 88, 0.12);
+    --accent-2: #a86a1f;
+    --accent-2-soft: rgba(168, 106, 31, 0.13);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+  }
+
+  .wrap {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3.25rem;
+  }
+
+  /* ---------- Cover ---------- */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .cover .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .cover h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(2.1rem, 4.4vw, 3rem);
+    margin: 0;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .cover p.lede {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin-top: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .meta-row span b { color: var(--ink); font-weight: 600; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 0.4rem;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    padding: 0.3rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--muted);
+  }
+  .chip i {
+    width: 0.6rem;
+    height: 0.6rem;
+    border-radius: 50%;
+    background: var(--accent);
+    display: inline-block;
+  }
+  .chip.diff i { background: var(--accent-2); }
+
+  /* ---------- Plates ---------- */
+  .plate-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .plate-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.55rem;
+  }
+  .plate-head h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: 1.4rem;
+    margin: 0;
+    letter-spacing: -0.005em;
+  }
+  .plate-head .idx {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .plate-desc {
+    font-size: 0.94rem;
+    color: var(--muted);
+    max-width: 68ch;
+    margin: -0.4rem 0 0.2rem;
+  }
+
+  .plate {
+    background: var(--plate-bg);
+    color: var(--plate-ink);
+    border: 1px solid var(--plate-line);
+    border-radius: 4px;
+    padding: 1.4rem;
+    overflow-x: auto;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .plate pre.mermaid {
+    margin: 0;
+    background: transparent;
+    min-width: 560px;
+  }
+
+  .plate-caption {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .plate-caption b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Two column layout for plate 02 ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 1.1rem;
+    align-items: stretch;
+  }
+  @media (max-width: 760px) {
+    .split { grid-template-columns: 1fr; }
+  }
+
+  .tree-plate {
+    background: var(--plate-bg);
+    color: var(--plate-ink);
+    border: 1px solid var(--plate-line);
+    border-radius: 4px;
+    padding: 1.2rem 1.4rem;
+    overflow-x: auto;
+  }
+  .tree-plate h3 {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0.7rem;
+    color: color-mix(in srgb, var(--plate-ink) 65%, transparent);
+  }
+  ul.tree, ul.tree ul {
+    list-style: none;
+    margin: 0;
+    padding-left: 1.05rem;
+    border-left: 1px dashed var(--plate-line);
+  }
+  ul.tree { padding-left: 0; border-left: none; }
+  ul.tree li {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    padding: 0.12rem 0 0.12rem 0.7rem;
+    white-space: nowrap;
+  }
+  ul.tree .dir { color: var(--plate-accent); font-weight: 600; }
+  ul.tree .diff { color: var(--plate-accent-2); font-weight: 600; }
+  ul.tree .note {
+    color: color-mix(in srgb, var(--plate-ink) 55%, transparent);
+    font-style: normal;
+    white-space: normal;
+  }
+
+  /* ---------- Footer ---------- */
+  .foot {
+    border-top: 1px solid var(--line);
+    padding-top: 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .plate-section { animation: rise 0.4s ease both; }
+    .plate-section:nth-of-type(2) { animation-delay: 0.05s; }
+    .plate-section:nth-of-type(3) { animation-delay: 0.1s; }
+    .plate-section:nth-of-type(4) { animation-delay: 0.15s; }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="cover">
+    <span class="eyebrow">Documento técnico · Para revisión de equipo</span>
+    <h1>D'asaro — Esquema de Arquitectura</h1>
+    <p class="lede">
+      Diagramas de sistema, jerarquía de módulos y relaciones de dominio para el ecommerce de
+      vitaminas y suplementos, con énfasis en los dos módulos diferenciales: la Encuesta de
+      Recomendación Nutricional y el Portal Educativo.
+    </p>
+    <div class="meta-row">
+      <span>Proyecto: <b>farmacia_app / D'asaro</b></span>
+      <span>Versión: <b>v1 — diseño</b></span>
+      <span>Fecha: <b>2026-08-31</b></span>
+      <span>Formato: <b>4 láminas, Mermaid</b></span>
+    </div>
+    <div class="legend">
+      <span class="chip"><i></i>Flujo núcleo (catálogo, órdenes, pagos)</span>
+      <span class="chip diff"><i></i>Flujo diferencial (encuesta ↔ educativo)</span>
+    </div>
+  </header>
+
+  <!-- PLATE 01 -->
+  <section class="plate-section">
+    <div class="plate-head">
+      <h2>01 — Arquitectura de sistema</h2>
+      <span class="idx">LÁMINA 01 / 04</span>
+    </div>
+    <p class="plate-desc">
+      Punto de entrada único vía Nginx (TLS), API FastAPI como backend único, Redis como cache y
+      broker del worker asíncrono, y los webhooks de las pasarelas de pago entrando por el mismo
+      borde que el resto del tráfico.
+    </p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#1e6e58','primaryTextColor':'#1b2a22','lineColor':'#1e6e58','secondaryColor':'#f2ead8','tertiaryColor':'#fbf9f2','fontFamily':'SFMono-Regular, Consolas, monospace','fontSize':'13px'}}}%%
+flowchart TD
+  U["Cliente\n(navegador)"] --> N["Nginx\nTLS · reverse proxy"]
+  N --> FE["Frontend SPA\nReact + Vite"]
+  N --> API["Backend API\nFastAPI"]
+  API --> DB[("PostgreSQL")]
+  API --> RD[("Redis\ncache")]
+  RD --> WK["Worker\nCelery / RQ"]
+  WK --> DB
+  API -->|inicia transacción| PG["Wompi / PayU"]
+  PG -.->|webhook| API
+</pre>
+    </div>
+    <div class="plate-caption">
+      <span><b>TLS</b> terminado en Nginx</span>
+      <span><b>Redis</b> cache + broker</span>
+      <span><b>Worker</b> emails y recálculo de recomendaciones</span>
+      <span><b>Pagos</b> sin custodia de tarjeta</span>
+    </div>
+  </section>
+
+  <!-- PLATE 02 -->
+  <section class="plate-section">
+    <div class="plate-head">
+      <h2>02 — Jerarquía de módulos y carpetas</h2>
+      <span class="idx">LÁMINA 02 / 04</span>
+    </div>
+    <p class="plate-desc">
+      El backend se organiza por capa (rutas → servicios → modelos) y, dentro de cada capa, por
+      módulo de negocio. <code style="font-family:var(--font-mono)">core/</code> es la base
+      compartida (seguridad, cifrado, cache) que todos los servicios consumen.
+    </p>
+    <div class="split">
+      <div class="plate">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#1e6e58','primaryTextColor':'#1b2a22','lineColor':'#1e6e58','secondaryColor':'#f2ead8','tertiaryColor':'#fbf9f2','clusterBkg':'#f5f1e4','clusterBorder':'#c9c2a8','fontFamily':'SFMono-Regular, Consolas, monospace','fontSize':'12.5px'}}}%%
+flowchart TB
+  subgraph RUTAS["api/routes"]
+    R1[auth]
+    R2[catalogo]
+    R3["encuesta/*"]
+    R4["educativo/*"]
+    R5["ordenes/*"]
+    R6["pagos/*"]
+  end
+  subgraph SERV["services"]
+    S1[auth_service]
+    S2[catalogo_service]
+    S3["recommendation_engine"]
+    S4[cross_sell_service]
+    S5[orden_service]
+    S6["payment_gateway"]
+  end
+  subgraph MODELOS["db/models"]
+    M1[usuario]
+    M2[catalogo]
+    M3[encuesta]
+    M4[educativo]
+    M5[ordenes]
+    M6[pagos]
+  end
+  CORE["core\nconfig · security · encryption · cache"]
+  R1-->S1-->M1
+  R2-->S2-->M2
+  R3-->S3-->M3
+  R4-->S4-->M4
+  R5-->S5-->M5
+  R6-->S6-->M6
+  CORE -.-> SERV
+</pre>
+      </div>
+      <div class="tree-plate">
+        <h3>backend/app — carpetas clave</h3>
+        <ul class="tree">
+          <li><span class="dir">core/</span></li>
+          <li><span class="dir">db/models/</span>
+            <ul>
+              <li>usuario.py</li>
+              <li>catalogo/</li>
+              <li><span class="diff">encuesta/</span> <span class="note">— perfil_salud cifrado</span></li>
+              <li><span class="diff">educativo/</span> <span class="note">— cross-sell + tags</span></li>
+              <li>ordenes/</li>
+              <li>pagos/</li>
+            </ul>
+          </li>
+          <li><span class="dir">services/</span>
+            <ul>
+              <li><span class="diff">encuesta/recommendation_engine.py</span></li>
+              <li><span class="diff">educativo/cross_sell_service.py</span></li>
+              <li>pagos/payment_gateway.py</li>
+              <li>tasks/ <span class="note">(worker)</span></li>
+            </ul>
+          </li>
+          <li><span class="dir">api/routes/</span>
+            <ul>
+              <li><span class="diff">encuesta/</span></li>
+              <li><span class="diff">educativo/</span></li>
+              <li>pagos/webhooks.py</li>
+            </ul>
+          </li>
+          <li><span class="dir">alembic/versions/</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATE 03 -->
+  <section class="plate-section">
+    <div class="plate-head">
+      <h2>03 — Relaciones de dominio</h2>
+      <span class="idx">LÁMINA 03 / 04</span>
+    </div>
+    <p class="plate-desc">
+      Las flechas gruesas marcan el enlace diferencial: el resultado de la encuesta recomienda
+      productos <i>y</i> artículos, y cada artículo puede enlazar de vuelta a productos y a las
+      reglas de recomendación que lo originaron.
+    </p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#1e6e58','primaryTextColor':'#1b2a22','lineColor':'#1e6e58','secondaryColor':'#f2ead8','tertiaryColor':'#fbf9f2','clusterBkg':'#f5f1e4','clusterBorder':'#c9c2a8','fontFamily':'SFMono-Regular, Consolas, monospace','fontSize':'12.5px'}}}%%
+flowchart LR
+  subgraph ENC["Encuesta Nutricional"]
+    CU[cuestionario] --> PR[pregunta] --> OP["opcion_respuesta\n(tag_nutricional)"]
+    RU[respuesta_usuario] --> DR[detalle_respuesta]
+    OP --> DR
+    DR --> PS["perfil_salud\n(cifrado)"]
+    OP --> RR[regla_recomendacion]
+    RR --> RES[resultado_recomendacion]
+  end
+  subgraph CAT["Catálogo"]
+    PROD[productos]
+  end
+  subgraph EDU["Portal Educativo"]
+    ART[articulos]
+    ARP[articulo_producto]
+    ARR[articulo_regla_recomendacion]
+  end
+  subgraph ORD["Órdenes"]
+    CARR[carrito] --> ORDN[orden] --> OI[orden_item]
+    ORDN --> TP[transaccion_pago]
+  end
+  RES ==>|recomienda| PROD
+  RES ==>|sugiere lectura| ART
+  ART --> ARP --> PROD
+  ART --> ARR --> RR
+  OI --> PROD
+</pre>
+    </div>
+    <div class="plate-caption">
+      <span><b>Cifrado</b> perfil_salud a nivel de aplicación</span>
+      <span><b>Versionado</b> cuestionario y reglas</span>
+      <span><b>Auditable</b> resultado_recomendacion</span>
+    </div>
+  </section>
+
+  <!-- PLATE 04 -->
+  <section class="plate-section">
+    <div class="plate-head">
+      <h2>04 — Flujo diferencial: encuesta → recomendación → contenido</h2>
+      <span class="idx">LÁMINA 04 / 04</span>
+    </div>
+    <p class="plate-desc">
+      El recorrido de negocio que sostiene el diferencial: el portal educativo no solo informa,
+      reenvía al usuario a la encuesta; y la encuesta no solo vende, también educa.
+    </p>
+    <div class="plate">
+<pre class="mermaid">
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#ffffff','primaryBorderColor':'#a86a1f','primaryTextColor':'#1b2a22','lineColor':'#a86a1f','secondaryColor':'#f2ead8','tertiaryColor':'#fbf9f2','fontFamily':'SFMono-Regular, Consolas, monospace','fontSize':'13px'}}}%%
+flowchart LR
+  A["Usuario\ningresa"] --> B["Consentimiento\nHabeas Data"]
+  B --> C["Responde\nencuesta"]
+  C --> D["Motor de\nrecomendación"]
+  D --> E["Productos\nsugeridos"]
+  D --> F["Artículos\nrelacionados"]
+  E --> G["Agregar\nal carrito"]
+  F --> H["Leer\nartículo"]
+  H -.->|CTA: repetir encuesta| C
+  G --> I["Checkout\nWompi / PayU"]
+</pre>
+    </div>
+    <div class="plate-caption">
+      <span><b>Bloqueante</b>: consentimiento antes de datos de salud</span>
+      <span><b>Ciclo</b> educativo ↔ encuesta ↔ catálogo</span>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>D'asaro · farmacia_app</span>
+    <span>Fuente completa del plan: /plans/primero-verifica-que-puedes-cheeky-sprout.md</span>
+  </footer>
+
+</div>
